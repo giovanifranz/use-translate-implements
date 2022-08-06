@@ -1,40 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useCallback } from 'react';
+import { useLanguage, useTranslate } from '@highlandertech/use-translate';
+import type {
+  Language,
+  DifferentTextsInput,
+} from '@highlandertech/use-translate';
 
-interface AppProps {}
+type Text = {
+  title: string;
+  description: string;
+};
 
-function App({}: AppProps) {
-  // Create the count state.
-  const [count, setCount] = useState(0);
-  // Create the counter (+1 every second).
-  useEffect(() => {
-    const timer = setTimeout(() => setCount(count + 1), 1000);
-    return () => clearTimeout(timer);
-  }, [count, setCount]);
-  // Return the App component.
+const data: DifferentTextsInput<Text> = {
+  portuguese: { title: 'Olá Mundo', description: 'Esse é o hook useTranslate' },
+  english: {
+    title: 'Hello World',
+    description: 'This is the useTranslate hook',
+  },
+};
+
+const currentLanguageText = {
+  portuguese: 'Você está usando Português',
+  english: 'You are using English',
+};
+
+function App() {
+  const { language, toggleLanguage } = useLanguage();
+  const { title, description } = useTranslate({ textsInput: data, language });
+  const currently = useTranslate({ textsInput: currentLanguageText, language });
+
+  const handleClick = useCallback(
+    (lang: Language) => toggleLanguage(lang),
+    [toggleLanguage],
+  );
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <p>
-          Page has been open for <code>{count}</code> seconds.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </p>
-      </header>
-    </div>
+    <>
+      <h1>{title}</h1>
+      <h2>{description}</h2>
+      <button onClick={() => handleClick('english')}>English</button>
+      <button onClick={() => handleClick('portuguese')}>Portuguese</button>
+      <p>{currently}</p>
+    </>
   );
 }
 
